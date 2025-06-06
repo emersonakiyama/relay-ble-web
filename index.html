@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pareamento BLE</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    h1 { color: #333; }
+    p { font-size: 18px; }
+    button { padding: 10px 20px; font-size: 16px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Conecte-se ao Seu Quarto</h1>
+  <p>Clique no botão abaixo .</p>
+  <button onclick="connectBLE()">Conectar</button>
+  <p id="status">Aguardando conexão...</p>
+  <script>
+    async function connectBLE() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'RelayBLE' }],
+          optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
+        });
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+        const characteristic = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+        const value = await characteristic.readValue();
+        document.getElementById('status').innerText = 'Conectado! Relé ativado.';
+        alert('Pareamento concluído com sucesso!');
+      } catch (error) {
+        document.getElementById('status').innerText = 'Erro: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
