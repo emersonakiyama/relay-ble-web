@@ -2,43 +2,31 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Pareamento BLE</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    h1 { color: #333; }
-    p { font-size: 18px; }
-    button { padding: 10px 20px; font-size: 16px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #0056b3; }
-    #status { color: #333; }
-  </style>
+  <style>body{font-family:Arial,sans-serif;text-align:center;padding:10px}h1{color:#333}button{padding:8px 16px;font-size:16px;background:#07f;color:#fff;border:0;border-radius:5px;cursor:pointer}button:hover{background:#056b3}#status{color:#333}</style>
 </head>
 <body>
-  <h1>Conectar ao Relé Bluetooth</h1>
-  <p>Clique no botão abaixo para parear com o relé.</p>
+  <h1>Conecta-se ao seu Quarto</h1>
   <button onclick="connectBLE()">Conectar</button>
-  <p id="status">Aguardando conexão...</p>
+  <p id="status">Conectando...</p>
   <script>
+    window.onload = connectBLE;
     async function connectBLE() {
       try {
-        document.getElementById('status').innerText = 'Procurando dispositivos...';
+        document.getElementById('status').innerText = 'Procurando...';
         const device = await navigator.bluetooth.requestDevice({
           filters: [{ name: 'RelayBLE' }],
           optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
         });
-        document.getElementById('status').innerText = 'Conectando ao dispositivo...';
+        document.getElementById('status').innerText = 'Conectando...';
         const server = await device.gatt.connect();
-        document.getElementById('status').innerText = 'Acessando serviço...';
         const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
-        document.getElementById('status').innerText = 'Acessando característica...';
         const characteristic = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
-        document.getElementById('status').innerText = 'Lendo valor...';
-        const value = await characteristic.readValue();
-        document.getElementById('status').innerText = 'Conectado! Relé ativado.';
-        alert('Pareamento concluído com sucesso!');
+        await characteristic.readValue();
+        document.getElementById('status').innerText = 'Conectado!';
       } catch (error) {
         document.getElementById('status').innerText = 'Erro: ' + error.message;
-        console.error('Erro detalhado:', error);
       }
     }
   </script>
